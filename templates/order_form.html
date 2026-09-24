@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="form-page page-width">
+  <a class="back-link" href="/orders">← НАЗАД К ЗАКАЗАМ</a>
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">АДМИНИСТРИРОВАНИЕ / ЗАКАЗЫ</div>
+      <h1>{{ mode }} заказа</h1>
+    </div>
+    <span class="id-box">№ <b>{{ order.order_number if order else next_number }}</b></span>
+  </div>
+
+  <form class="admin-form" method="post" action="{% if order %}/admin/order/{{ order.order_id }}/edit{% else %}/admin/order/new{% endif %}">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <div class="form-grid">
+      <label>Артикул(ы) заказа<textarea name="item_text" rows="4" required placeholder="VNL001, 2, VNL002, 1">{{ item_text }}</textarea><small>Формат: «артикул, количество, артикул, количество». Товары и количества проверяются по БД.</small></label>
+      <label>Статус заказа<select name="status">{% for value in status_values %}<option value="{{ value }}" {% if order and order.status == value %}selected{% endif %}>{{ status_label(value) }}</option>{% endfor %}</select></label>
+      <label>Адрес пункта выдачи<select name="pickup_point_id" required>{% for point in pickup_points %}<option value="{{ point.pickup_point_id }}" {% if order and order.pickup_point_id == point.pickup_point_id %}selected{% endif %}>{{ point.address }}</option>{% endfor %}</select></label>
+      <label>Клиент<select name="client_id" required>{% for client in clients %}<option value="{{ client.user_id }}" {% if order and order.client_id == client.user_id %}selected{% endif %}>{{ client.full_name }}</option>{% endfor %}</select></label>
+      <label>Номер заказа<input name="order_number" type="number" min="1" required value="{{ order.order_number if order else next_number }}"></label>
+      <label>Код для получения<input name="pickup_code" type="number" min="0" required value="{{ order.pickup_code if order else 900 + next_number }}"></label>
+      <label>Дата заказа<input name="order_date" type="date" required value="{{ order.order_date.isoformat() if order else '' }}"></label>
+      <label>Дата выдачи<input name="delivery_date" type="date" value="{{ order.delivery_date.isoformat() if order and order.delivery_date else '' }}"></label>
+    </div>
+    <div class="form-note">Форма содержит обязательные поля задания и дополнительные поля исходных данных, необходимые для сохранения полной структуры заказов.</div>
+    <div class="form-actions"><button class="button primary" type="submit">СОХРАНИТЬ</button><a class="button secondary" href="/orders">ОТМЕНА</a></div>
+  </form>
+</section>
+{% endblock %}

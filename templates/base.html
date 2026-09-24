@@ -1,0 +1,78 @@
+{% macro product_link(product) %}/product/{{ product.product_id }}{% endmacro %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} · USTUJ RECORDS</title>
+  <link rel="icon" type="image/svg+xml" href="/static/resources/ustuj_favicon.svg">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="{% if request.url.path in ['/catalog', '/guest'] %}catalog-page-body{% endif %}" data-role="{{ role }}">
+  <header class="site-header">
+    <div class="header-main page-width">
+      <a class="brand brand-text" href="{% if current_user %}/catalog{% else %}/login{% endif %}" aria-label="USTUJ RECORDS">
+        <span>USTUJ</span><small>RECORDS</small>
+      </a>
+
+      <div class="header-search">
+        {% if current_user and role in ['manager', 'admin'] %}
+          <span>УПРАВЛЕНИЕ КАТАЛОГОМ</span>
+        {% else %}
+          <span>МАГАЗИН ВИНИЛОВЫХ ПЛАСТИНОК</span>
+        {% endif %}
+      </div>
+
+      <div class="header-actions">
+        {% if current_user %}
+          <div class="user-block">
+            <span class="mini-label">УЧЁТНАЯ ЗАПИСЬ</span>
+            <strong>{{ current_user.full_name }}</strong>
+            <small>{{ role_label }}</small>
+          </div>
+          <a class="header-action" href="/logout">ВЫЙТИ</a>
+        {% else %}
+          <a class="header-action" href="/login">ВОЙТИ</a>
+        {% endif %}
+        {% if request.url.path != '/login' %}
+          <a class="cart-box" href="/cart" aria-label="Корзина">
+            <span>КОРЗИНА</span><b>{{ cart_count }}</b>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <nav class="nav-bar" aria-label="Основная навигация">
+      <div class="page-width nav-inner">
+        {% if current_user %}
+          <a class="nav-item" href="/catalog">КАТАЛОГ</a>
+          {% if role in ['manager', 'admin'] %}
+            <a class="nav-item" href="/catalog?section=preorder">ПРЕДЗАКАЗ</a>
+            <a class="nav-item" href="/orders">ЗАКАЗЫ</a>
+          {% endif %}
+        {% else %}
+          <a class="nav-item" href="/guest">КАТАЛОГ</a>
+          <a class="nav-item" href="/login">ВОЙТИ</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  {% for message in flash_messages %}
+    <div class="flash {{ message.level }} page-width">
+      <span class="flash-icon">{% if message.level == 'error' %}!{% elif message.level == 'warning' %}!{% else %}✓{% endif %}</span>
+      <span>{{ message.message }}</span>
+    </div>
+  {% endfor %}
+
+  <main>{% block content %}{% endblock %}</main>
+
+  {% if show_footer %}
+    <footer class="site-footer">
+      <div class="page-width footer-simple">USTUJ RECORDS</div>
+    </footer>
+  {% endif %}
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

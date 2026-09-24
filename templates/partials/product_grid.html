@@ -1,0 +1,56 @@
+<div class="product-grid">
+  {% for product in products %}
+    <article class="product-card {% if product.discount > 15 %}high-discount{% endif %} {% if product.stock_quantity == 0 %}out-of-stock{% endif %}">
+      <a class="product-image" href="/product/{{ product.product_id }}">
+        <img src="{{ product.image_url }}" alt="{{ product.artist }} — {{ product.name }}" onerror="this.onerror=null;this.src='/static/resources/picture.png';">
+        <div class="badges">
+          {% if product.is_new %}<span>НОВИНКА</span>{% endif %}
+          {% if product.is_color_vinyl %}<span>ЦВЕТНОЙ ВИНИЛ</span>{% endif %}
+          {% if product.is_preorder %}<span>ПРЕДЗАКАЗ</span>{% endif %}
+        </div>
+        {% if product.stock_quantity == 0 %}<span class="soldout">НЕТ НА СКЛАДЕ</span>{% endif %}
+      </a>
+      <div class="product-info">
+        <div class="product-artist">{{ product.artist }}</div>
+        <h3><a href="/product/{{ product.product_id }}">{{ product.name }}</a></h3>
+        <div class="product-meta">{{ product.category.name }} · {{ product.record_format.name }}</div>
+        <div class="product-description">{{ product.description }}</div>
+        <div class="product-facts"><span>{{ product.label.name }}</span><span>{{ product.supplier.name }}</span></div>
+        <div class="price-row">
+          {% if product.discount > 0 %}<del>{{ money(product.price) }}</del>{% endif %}
+          <strong>{{ money(product.discounted_price) }}</strong>
+          {% if product.discount > 0 %}<span class="discount-chip">-{{ product.discount }}%</span>{% endif %}
+        </div>
+        <div class="stock-row">
+          <span>{{ product.stock_quantity }} {{ product.unit }} на складе</span>
+          <span class="card-actions">
+            {% if product.stock_quantity > 0 %}
+              <form method="post" action="/cart/add">
+                <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                <button type="submit">В корзину</button>
+              </form>
+            {% else %}
+              <span>Недоступно</span>
+            {% endif %}
+            {% if role == 'admin' %}
+              <span class="admin-actions-inline">
+                <a href="/admin/product/{{ product.product_id }}/edit">Изменить</a>
+                <form action="/admin/product/{{ product.product_id }}/delete" method="post" onsubmit="return confirm('Удалить товар {{ product.name|e }}? Операция необратима.');">
+                  <input type="hidden" name="csrf" value="{{ csrf_token }}">
+                  <button type="submit">Удалить</button>
+                </form>
+              </span>
+            {% endif %}
+          </span>
+        </div>
+      </div>
+    </article>
+  {% else %}
+    <div class="empty-state">
+      <div class="eyebrow">НЕТ РЕЗУЛЬТАТОВ</div>
+      <h3>Ничего не найдено</h3>
+      <p>Измените поисковый запрос или сбросьте поставщика.</p>
+    </div>
+  {% endfor %}
+</div>

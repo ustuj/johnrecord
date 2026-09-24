@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero page-width">
+  <div class="hero-center">
+    <div class="eyebrow">ВИНИЛ · МУЗЫКА · КУЛЬТУРА</div>
+    <h1>Звук приходит<br>раньше, чем ты<br>открываешь дверь.</h1>
+  </div>
+</section>
+
+<section class="page-width catalog-section" id="catalog">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">ПОДБОРКА</div>
+      <h2>{% if section_name %}{{ section_name }}{% else %}Каталог винила{% endif %}</h2>
+    </div>
+    <div class="section-head-actions">
+      <span class="result-label"><b id="result-count">{{ products|length }}</b> ПОЗИЦИЙ</span>
+      {% if role == 'admin' %}<a class="button primary" href="/admin/product/new">ДОБАВИТЬ ТОВАР</a>{% endif %}
+    </div>
+  </div>
+
+  {% if controls_enabled %}
+    <div class="filters">
+      <label>
+        <span>ПОИСК ПО ТЕКСТОВЫМ ДАННЫМ</span>
+        <input id="catalog-search" type="search" value="{{ search or '' }}" placeholder="Артикул, название, артист, категория, описание, производитель, поставщик...">
+      </label>
+      <label>
+        <span>ПОСТАВЩИК</span>
+        <select id="supplier-filter">
+          <option value="">Все поставщики</option>
+          {% for supplier in suppliers %}
+            <option value="{{ supplier.supplier_id }}" {% if selected_supplier == supplier.supplier_id|string %}selected{% endif %}>{{ supplier.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>СОРТИРОВКА ПО КОЛИЧЕСТВУ</span>
+        <select id="stock-sort">
+          <option value="">По умолчанию</option>
+          <option value="asc" {% if stock_sort == 'asc' %}selected{% endif %}>По возрастанию</option>
+          <option value="desc" {% if stock_sort == 'desc' %}selected{% endif %}>По убыванию</option>
+        </select>
+      </label>
+    </div>
+  {% endif %}
+
+  <div id="catalog-grid">{% include 'partials/product_grid.html' %}</div>
+</section>
+{% endblock %}

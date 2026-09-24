@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="form-page page-width">
+  <a class="back-link" href="/catalog">← НАЗАД В КАТАЛОГ</a>
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">АДМИНИСТРИРОВАНИЕ / ПЛАСТИНКИ</div>
+      <h1>{{ mode }} пластинки</h1>
+    </div>
+    <span class="id-box">{% if product %}ID: <input class="id-readonly" value="{{ product.product_id }}" readonly aria-label="Идентификатор товара"> {% else %}ID будет определен автоматически{% endif %}</span>
+  </div>
+
+  <form class="admin-form" method="post" enctype="multipart/form-data" action="{% if product %}/admin/product/{{ product.product_id }}/edit{% else %}/admin/product/new{% endif %}">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <div class="form-grid">
+      <label>Артикул<input name="article" required value="{{ product.article if product else '' }}" placeholder="VNL031"></label>
+      <label>Наименование товара<input name="name" required value="{{ product.name if product else '' }}"></label>
+      <label>Исполнитель / артист<input name="artist" required value="{{ product.artist if product else '' }}"></label>
+      <label>Категория товара<select name="category_id" required>{% for item in categories %}<option value="{{ item.category_id }}" {% if product and product.category_id == item.category_id %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></label>
+      <label>Лейбл<select name="label_id" required>{% for item in labels %}<option value="{{ item.label_id }}" {% if product and product.label_id == item.label_id %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></label>
+      <label>Производитель<select name="manufacturer_id" required>{% for item in manufacturers %}<option value="{{ item.manufacturer_id }}" {% if product and product.manufacturer_id == item.manufacturer_id %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></label>
+      <label>Поставщик<select name="supplier_id" required>{% for item in suppliers %}<option value="{{ item.supplier_id }}" {% if product and product.supplier_id == item.supplier_id %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></label>
+      <label>Формат<select name="format_id" required>{% for item in formats %}<option value="{{ item.format_id }}" {% if product and product.format_id == item.format_id %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></label>
+      <label>Цена<input name="price" required inputmode="decimal" min="0" step="0.01" value="{{ product.price if product else '' }}"></label>
+      <label>Единица измерения<input name="unit" required value="{{ product.unit if product else 'шт.' }}"></label>
+      <label>Количество на складе<input name="stock_quantity" required type="number" min="0" value="{{ product.stock_quantity if product else 0 }}"></label>
+      <label>Действующая скидка<input name="discount" required type="number" min="0" max="100" value="{{ product.discount if product else 0 }}"></label>
+      <label class="wide">Фото товара<input name="image" type="file" accept="image/jpeg,image/png,image/webp"><small>Сохраняется в папку приложения. После обработки размер не превышает 300×200 px.</small>{% if product %}<small class="current-file">Текущее: {% if product.image_path %}{{ product.image_path }}{% else %}заглушка picture.png{% endif %}</small>{% endif %}</label>
+      <label class="wide">Описание товара<textarea name="description" rows="5">{{ product.description if product else '' }}</textarea></label>
+    </div>
+
+    <div class="check-row">
+      <label><input type="checkbox" name="is_new" {% if product and product.is_new %}checked{% endif %}> НОВИНКА</label>
+      <label><input type="checkbox" name="is_bestseller" {% if product and product.is_bestseller %}checked{% endif %}> БЕСТСЕЛЛЕР</label>
+      <label><input type="checkbox" name="is_staff_pick" {% if product and product.is_staff_pick %}checked{% endif %}> ВЫБОР КОМАНДЫ</label>
+      <label><input type="checkbox" name="is_preorder" {% if product and product.is_preorder %}checked{% endif %}> ПРЕДЗАКАЗ</label>
+      <label><input type="checkbox" name="is_color_vinyl" {% if product and product.is_color_vinyl %}checked{% endif %}> ЦВЕТНОЙ ВИНИЛ</label>
+    </div>
+
+    <div class="form-actions">
+      <button class="button primary" type="submit">СОХРАНИТЬ</button>
+      {% if product %}<a class="button secondary" href="/admin/product/{{ product.product_id }}/cancel">ОТМЕНА</a>{% else %}<a class="button secondary" href="/catalog">ОТМЕНА</a>{% endif %}
+    </div>
+  </form>
+</section>
+{% endblock %}

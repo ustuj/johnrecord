@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="cart-page page-width">
+  <a class="back-link" href="/catalog">← НАЗАД В КАТАЛОГ</a>
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">ЗАКАЗ</div>
+      <h1>Корзина</h1>
+    </div>
+    {% if items %}
+      <form method="post" action="/cart/clear">
+        <input type="hidden" name="csrf" value="{{ csrf_token }}">
+        <button class="button secondary" type="submit">ОЧИСТИТЬ КОРЗИНУ</button>
+      </form>
+    {% endif %}
+  </div>
+
+  {% if items %}
+    <div class="cart-list">
+      {% for item in items %}
+        <article class="cart-row">
+          <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" onerror="this.onerror=null;this.src='/static/resources/picture.png';">
+          <div>
+            <div class="product-artist">{{ item.product.artist }}</div>
+            <h3><a href="/product/{{ item.product.product_id }}">{{ item.product.name }}</a></h3>
+            <p>{{ item.product.record_format.name }} · {{ item.product.category.name }}</p>
+          </div>
+          <form class="cart-quantity" method="post" action="/cart/update">
+            <input type="hidden" name="csrf" value="{{ csrf_token }}">
+            <input type="hidden" name="product_id" value="{{ item.product.product_id }}">
+            <label>Количество<input type="number" name="quantity" min="1" max="{{ item.product.stock_quantity }}" value="{{ item.quantity }}"></label>
+            <button class="button secondary" type="submit">ОБНОВИТЬ</button>
+          </form>
+          <div class="cart-price">{{ money(item.product.discounted_price * item.quantity) }}</div>
+          <form method="post" action="/cart/remove">
+            <input type="hidden" name="csrf" value="{{ csrf_token }}">
+            <input type="hidden" name="product_id" value="{{ item.product.product_id }}">
+            <button class="link-button" type="submit">Удалить</button>
+          </form>
+        </article>
+      {% endfor %}
+    </div>
+    <div class="cart-total">
+      <span>Итого</span><strong>{{ money(total) }}</strong>
+    </div>
+  {% else %}
+    <div class="empty-state cart-empty">
+      <h3>Корзина пуста</h3>
+      <p>Добавьте пластинки из каталога.</p>
+      <a class="button primary" href="/catalog">ОТКРЫТЬ КАТАЛОГ</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

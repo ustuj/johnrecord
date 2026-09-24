@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="login-shell page-width">
+  <div class="login-panel">
+    <div class="login-brand-text"><span>USTUJ</span><small>RECORDS</small></div>
+    <div class="eyebrow">ВИНИЛ · МУЗЫКА · КУЛЬТУРА</div>
+    <h1>Вход</h1>
+
+    <form class="login-form" method="post" action="/login">
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <label>ЛОГИН<input name="login" type="text" autocomplete="username" required placeholder="Введите логин"></label>
+      <label>ПАРОЛЬ<input name="password" type="password" autocomplete="current-password" required placeholder="Введите пароль"></label>
+      <button class="button primary full" type="submit">ВОЙТИ</button>
+    </form>
+
+    <a class="button secondary full" href="/guest">ВОЙТИ КАК ГОСТЬ</a>
+  </div>
+</section>
+{% endblock %}

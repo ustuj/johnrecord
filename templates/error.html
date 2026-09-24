@@ -1,0 +1,2 @@
+{% extends 'base.html' %}
+{% block content %}<section class="error-page page-width"><div class="eyebrow">ОШИБКА</div><h1>{{ title }}</h1><p>{{ message }}</p><a class="button primary" href="{% if current_user %}/catalog{% else %}/login{% endif %}">НАЗАД</a></section>{% endblock %}
